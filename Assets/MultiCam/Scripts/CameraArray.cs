@@ -12,8 +12,11 @@ public class CameraArray : MonoBehaviour {
 
     private Mesh mesh;
     private Vector3[] vertices;
+    private Renderer ren;
 
     private void Awake() {
+        ren = GetComponent<Renderer>();
+        ren.enabled = false;
         mesh = GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         cams = new List<Camera>();
