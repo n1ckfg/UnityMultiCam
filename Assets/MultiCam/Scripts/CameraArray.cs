@@ -1,4 +1,15 @@
-﻿using System.Collections;
+﻿/*
+https://www.linkedin.com/pulse/5-tips-improve-your-photogrammetry-scan-quality-using-jingyi-zhang/
+
+"We've seen people build setups with as few as 64 cameras, but at that point
+there's so much occlusion that the mesh is going to need a lot more cleanup...At
+our studio, we currently use 128 cameras to ensure that we're not missing any
+information...If you are using an APS-C format camera, we recommend using at
+least a 24mm lens (the equivalent to about a 38mm on a full frame) for best
+results."
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

@@ -8,16 +8,17 @@ public class Recorder : MonoBehaviour {
 
     public enum RecMode { TIME_DELAY, KEY_TRIGGER };
     public enum CaptureMode { SINGLE_CAM, CAM_ARRAY_STILL, CAM_ARRAY_VIDEO };
-    //public enum FxMode { NONE, DEPTH, SLITSCAN };
     public enum ImageFormat { FLOAT, ALPHA };
+    public enum LensMode { FIELD_OF_VIEW, FOCAL_LENGTH };
 
-    [Header("Setup")]
+    [Header("~ Setup ~")]
     public RecMode recMode = RecMode.TIME_DELAY;
     public CaptureMode captureMode = CaptureMode.SINGLE_CAM;
-    //public FxMode fxMode = FxMode.NONE;
     public ImageFormat imageFormat = ImageFormat.ALPHA;
+    public LensMode lensMode = LensMode.FOCAL_LENGTH;
+    public float focalLength = 38f;
 
-    [Header("Capture")]
+    [Header("~ Capture ~")]
 	public string fileName = "frame";
 	public string filePath = "Frames";
 	public int resWidth = 1920;
@@ -31,19 +32,17 @@ public class Recorder : MonoBehaviour {
 	public int superSample = 1;
 	public int zeroPadding = 4;
     
-    public float mayaCameraAngleOfView = 54.43f;
-
-    [Header("Linkage")]
+    [Header("~ Linkage ~")]
     public CameraArray camArray;
-	public GameObject mayaCamera;
+	public Transform mayaCamera;
+    public float mayaAngleOfView = 54.43f; // Maya default
 
-	[System.Serializable]
+    [System.Serializable]
 	public struct AnimatorInfo {
 		public Animator animator;
 		public float animatorSpeed;
 	}
 
-	//public Material depthMat;
     public AnimatorInfo[] animatorInfo;
 
     private float timeScaleOrig; // track timescale to freeze animation between frames
@@ -52,31 +51,7 @@ public class Recorder : MonoBehaviour {
     private float markTime = 0f;
     private bool firstRun = true;
 
-    /*
-    private void Awake() {
-        if (captureMode == CaptureMode.SINGLE_CAM) {
-            if (fxMode == FxMode.DEPTH) {
-                Camera.main.gameObject.AddComponent<RecorderDepthPass>();
-            } else if (fxMode == FxMode.SLITSCAN) {
-                ;
-                Camera.main.gameObject.AddComponent<Kino.Slitscan>();
-            }
-        } else {
-            if (fxMode == FxMode.DEPTH) {
-                for (int i = 0; i < camArray.cams.Count; i++) {
-                    camArray.cams[i].gameObject.AddComponent<RecorderDepthPass>();
-                }
-            } else if (fxMode == FxMode.SLITSCAN) {
-                for (int i = 0; i < camArray.cams.Count; i++) {
-                    camArray.cams[i].gameObject.AddComponent<Kino.Slitscan>();
-                }
-            }
-        }
-    }
-    */
-
     private void Start() { 
-        if (mayaCamera != null) mayaCameraCorrect(Camera.main);
 		Application.runInBackground = true;
 		Time.fixedDeltaTime = 1.0f/fps;
 		Time.captureFramerate = (int) fps;
@@ -88,8 +63,21 @@ public class Recorder : MonoBehaviour {
 		}
 		Directory.CreateDirectory(uniqueFilePath);  
 
-        if (captureMode == CaptureMode.CAM_ARRAY_VIDEO) {
+        if (captureMode == CaptureMode.SINGLE_CAM) {
+            if (mayaCamera != null) {
+                mayaCameraCorrect();
+            } else if (lensMode == LensMode.FOCAL_LENGTH) {
+                Camera.main.fieldOfView = flToFov();
+            }
+        } else if (captureMode == CaptureMode.CAM_ARRAY_STILL) {
+            if (lensMode == LensMode.FOCAL_LENGTH) {
+                for (int i = 0; i < camArray.cams.Count; i++) {
+                    camArray.cams[i].fieldOfView = flToFov();
+                }
+            }
+        } else if (captureMode == CaptureMode.CAM_ARRAY_VIDEO) {
             for (int i=0; i<camArray.cams.Count; i++) {
+                if (lensMode == LensMode.FOCAL_LENGTH) camArray.cams[i].fieldOfView = flToFov();
                 String subUrl = Path.Combine(uniqueFilePath, String.Format("Cam" + "{1:D0" + zeroPadding + "}", uniqueFilePath, i));
                 Debug.Log(subUrl);
                 Directory.CreateDirectory(subUrl);
@@ -103,7 +91,6 @@ public class Recorder : MonoBehaviour {
 			animatorInfo[i].animator.speed = animatorInfo[i].animatorSpeed; 
 		}
 
-        //activate = true;
         markTime = Time.realtimeSinceStartup;
 	}
 
@@ -189,14 +176,26 @@ public class Recorder : MonoBehaviour {
 		System.IO.File.WriteAllBytes(path, bytes);
 	}
 
-	private void mayaCameraCorrect(Camera cam) {
-		cam.transform.position = mayaCamera.transform.position;
-		cam.transform.rotation = mayaCamera.transform.rotation * Quaternion.Euler(0,180,0);
-		cam.transform.parent = mayaCamera.transform;
-		
-		if (mayaCameraAngleOfView > 0.0f) {
-			cam.fieldOfView = mayaCameraAngleOfView * 0.596f;    
-		}
+	private void mayaCameraCorrect() {
+		Camera.main.transform.position = mayaCamera.transform.position;
+        Camera.main.transform.rotation = mayaCamera.transform.rotation * Quaternion.Euler(0,180,0);
+        Camera.main.transform.parent = mayaCamera.transform;
+        Camera.main.fieldOfView = aovToFov();
 	}
+
+    private float aovToFov() {
+        float fieldOfView = mayaAngleOfView * 0.596f;
+        if (fieldOfView < 1f) fieldOfView = 1f;
+        return fieldOfView;
+    }
+
+    private float flToFov() {
+        // https://answers.unity.com/questions/431046/is-it-possible-to-get-the-actual-simulated-lens-in.html
+        // http://paulbourke.net/miscellaneous/lens/
+        // https://en.wikipedia.org/wiki/35mm_format -- 35mm film is 36mm x 24mm
+        float fieldOfView = 2f * Mathf.Atan((0.5f * 24f) / focalLength);
+        if (fieldOfView < 1f) fieldOfView = 1f;
+        return fieldOfView;
+    }
 
 }
