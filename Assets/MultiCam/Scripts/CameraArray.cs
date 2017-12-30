@@ -15,6 +15,12 @@ using UnityEngine;
 
 public class CameraArray : MonoBehaviour {
 
+    public enum AlignMode { CENTER, UP, NONE };
+    public enum LensMode { FIELD_OF_VIEW, FOCAL_LENGTH };
+    public AlignMode alignMode = AlignMode.CENTER;
+    public LensMode lensMode = LensMode.FIELD_OF_VIEW;
+    public float fieldOfView = 24f;
+    public float focalLength = 38f;
     public Camera camPrefab;
     //public float fov = 60f;
     //public Color bgColor = new Color(0f, 0f, 0f, 1f);
@@ -45,22 +51,34 @@ public class CameraArray : MonoBehaviour {
 
             if (makeNewCam) {
                 Camera cam = Instantiate(camPrefab, transform);// new GameObject().AddComponent<Camera>();
-                cam.name = "ArrayCamera_" + (i+1);
+                cam.name = "ArrayCamera_" + (i + 1);
 
-                /*
-                cam.backgroundColor = bgColor;
-                cam.fieldOfView = fov;
-                cam.clearFlags = CameraClearFlags.SolidColor;
-                cam.nearClipPlane = 0.01f;
-                cam.farClipPlane = 1000f;
-                */
-
-                //cam.transform.parent = transform;
+                if (lensMode == LensMode.FIELD_OF_VIEW) {
+                    cam.fieldOfView = fieldOfView;
+                } else if (lensMode == LensMode.FOCAL_LENGTH) {
+                    cam.fieldOfView = flToFov();
+                }
                 cam.transform.position = p;
-                cam.transform.LookAt(transform);
+
+                if (alignMode == AlignMode.CENTER) {
+                    cam.transform.LookAt(transform);
+                } else if (alignMode == AlignMode.UP) {
+                    cam.transform.rotation = Quaternion.LookRotation(transform.up);
+                }
+
                 cams.Add(cam);
             }
         }
+    }
+
+    private float flToFov() {
+        // https://answers.unity.com/questions/431046/is-it-possible-to-get-the-actual-simulated-lens-in.html
+        // http://paulbourke.net/miscellaneous/lens/
+        // https://en.wikipedia.org/wiki/35mm_format -- 35mm film is 36mm x 24mm
+        float fov = 100f * 2f * Mathf.Atan((0.5f * 24f) / focalLength);
+        Debug.Log(fov);
+        if (fov < 1f) fov = 1f;
+        return fov;
     }
 
 }
