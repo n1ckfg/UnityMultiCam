@@ -28,11 +28,11 @@ public class MultiCamRender : MonoBehaviour {
 			RenderTexture.active = renderTexture;  
 
 			if (multiCamMgr.cam[i].enabled) {
-				float fov = multiCamMgr.cam[i].fov;
+				float fov = multiCamMgr.cam[i].fieldOfView;
 				multiCamMgr.cam[i].targetTexture = renderTexture;
 				multiCamMgr.cam[i].Render();
 				multiCamMgr.cam[i].targetTexture = null;
-				multiCamMgr.cam[i].fov = fov;
+				multiCamMgr.cam[i].fieldOfView = fov;
 			}
 
 			result.ReadPixels(new Rect(0f, 0f, a_Width, a_Height), i * a_Width, 0, false);
@@ -55,11 +55,11 @@ public class MultiCamRender : MonoBehaviour {
 		//foreach (Camera camera in cameras) {
 		foreach (Camera camera in multiCamMgr.cam) {
 			if (camera.enabled) {
-				float fov = camera.fov;
+				float fov = camera.fieldOfView;
 				camera.targetTexture = renderTexture;
 				camera.Render();
 				camera.targetTexture = null;
-				camera.fov = fov;
+				camera.fieldOfView = fov;
 			}
 		}
 
