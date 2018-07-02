@@ -9,6 +9,7 @@ public class MultiCamManager : MonoBehaviour {
     public MultiMode mmode = MultiMode.CAM_TO_DISPLAY;
 
 	public Camera renderCam;
+    public SettingsManager settingsMgr;
 	public float fov = 70f;
 	public int screenWidth = 1920;
 	public int screenHeight = 1080;
