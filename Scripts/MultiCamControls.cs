@@ -27,12 +27,6 @@ public class MultiCamControls : MonoBehaviour {
 		stepOrig = step;
 	}
 
-	/*
-	void Start() {
-		Screen.SetResolution(screenWidth, screenHeight, fullscreen);
-	}
-	*/
-
 	void Update() {
 		if (firstRun && ready) {
 			Screen.SetResolution(screenWidth, screenHeight, fullscreen);

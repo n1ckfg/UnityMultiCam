@@ -462,11 +462,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 784e0c52b3145d94dbf00cec5f19be3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mmode: 1
   renderCam: {fileID: 0}
   fov: 90
   screenWidth: 1920
   screenHeight: 1200
   refreshRate: 60
+  nearClip: 0.01
+  farClip: 1000
   fullscreen: 1
   step: 0.1
   cam:
@@ -481,7 +484,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 520026262}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d97121c5995c564aaeeb1d953550e83, type: 3}
   m_Name: 
