@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public class Recorder : MonoBehaviour {
+public class MultiCamRecorder : MonoBehaviour {
 
     public enum RecMode { TIME_DELAY, KEY_TRIGGER };
     public enum CaptureMode { SINGLE_CAM, CAM_ARRAY_STILL, CAM_ARRAY_VIDEO };
