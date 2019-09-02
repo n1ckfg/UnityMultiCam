@@ -75,3 +75,27 @@ public class SettingsManager : MonoBehaviour {
     }
 
 }
+
+public class SettingsJson {
+
+    public int mode;
+    public int width;
+    public int height;
+    public float fov;
+    public float near_clip;
+    public float far_clip;
+    public float refresh_rate;
+    public bool fullscreen;
+    public bool use_volume_trigger;
+    
+    public List<CameraObj> cameras;
+
+    [System.Serializable]
+    public struct CameraObj {
+        public string name;
+        public float rotation_y;
+        public int target_display;
+        public int control_display;
+    }
+
+}
